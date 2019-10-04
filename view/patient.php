@@ -8,13 +8,24 @@ if(isset($btnPatClicked)){
     $bhp = filter_input(0,"bhp");
     $bhd = filter_input(0,"bhd");
     $phn = filter_input(0,"phn");
-    $pto = filter_input(0,"pto");
+    $namafile = $mrn;
+    if(($_FILES['pto']['name'] == null) == 1){
+        echo "kolom file kosong";
+        $pto = "";
+    }else{
+        $namasementara = $_FILES['pto']['tmp_name'];
+        $dirupload = "upload/";
+        move_uploaded_file($namasementara,$dirupload.$namafile);
+        $pto = $dirupload.$namafile;
+    }
     $ins = filter_input(0,"ins");
     addPatient($mrn,$cidn,$nme,$addr,$bhp,$bhd,$phn,$pto,$ins);
 }
 
 $deleted = filter_input(1,"mrn");
 if(isset($deleted)){
+    $pat = getOnePatient($deleted);
+    unlink($pat['photo']);
     delPatient($deleted);
     header('Location:index.php?nav=pat');
 }
@@ -22,7 +33,7 @@ if(isset($deleted)){
 
 <fieldset>
     <legend>manipulate data</legend>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <label for="medrecnum">med record number:</label><br>
         <input type="text" id="medrecnum" name="mrn">
         <br>
@@ -45,7 +56,7 @@ if(isset($deleted)){
         <input type="text" id="phnum" name="phn">
         <br>
         <label for="phto">photo:</label><br>
-        <input type="text" id="phto" name="pto">
+        <input type="file" id="phto" name="pto">
         <br>
         <label for="insurance">insurance:</label><br>
         <select id="insurance" name="ins">
@@ -88,10 +99,10 @@ if(isset($deleted)){
         .'<td>'.$patient["birth_place"].'</td>'
         .'<td>'.$patient["birth_date"].'</td>'
         .'<td>'.$patient["phone_number"].'</td>'
-        .'<td>'.$patient["photo"].'</td>'
+        .'<td><img src="'.$patient["photo"].'"></td>'
         .'<td>'.$patient["name_class"].'</td>'
         .'<td><button onclick="patDelete('.$patstrg.')">delete</button>';
-        if($_SESSION['logged_as']=="Registration Officer"){
+        if($_SESSION['logged_as']["name"]!="Registration Officer"){
             echo '<button onclick="patUpdate('.$patstrg.')">update</button></td>';
         }else{
             echo '</td>';

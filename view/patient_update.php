@@ -13,8 +13,18 @@ if(isset($updated)){
     $bhp = filter_input(0,"bhp");
     $bhd = filter_input(0,"bhd");
     $phn = filter_input(0,"phn");
-    $pto = filter_input(0,"pto");
     $ins = filter_input(0,"ins");
+    $namafile = $mrn;
+    if(($_FILES['pto']['name'] == null) == 1){
+        echo "kolom file kosong";
+        $pto = $mrns['photo'];
+    }else{
+        unlink($mrns['photo']);
+        $namatemp = $_FILES['pto']['tmp_name'];
+        $namadir = "upload/";
+        move_uploaded_file($namatemp,$namadir.$namafile);
+        $pto = $namadir.$namafile;
+    }
     updPatient($mrn,$cidn,$nme,$addr,$bhp,$bhd,$phn,$pto,$ins);
     header("Location:index.php?nav=pat");
 }
@@ -22,7 +32,7 @@ if(isset($updated)){
 
 <fieldset>
     <lengend>update pasien</lengend>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <label for="citidnum">citizen id number:</label><br>
         <?php
             echo'<input type="text" id="citidnum" name="cidn" value="'.$mrns["citizen_id_number"].'">';
@@ -61,7 +71,7 @@ if(isset($updated)){
 
         <label for="phto">photo:</label><br>
         <?php
-            echo '<input type="text" id="phto" name="pto" value="'.$mrns["photo"].'">';
+            echo '<input type="file" id="phto" name="pto" value="'.$mrns["photo"].'">';
         ?>
         <br>
 
